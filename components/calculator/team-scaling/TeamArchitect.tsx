@@ -1,14 +1,18 @@
 "use client"
 
 import { useTeamStore } from "@/store/teamStore"
+import { currencies, formatInHouseBenchmark, toDisplayCurrency } from "@/lib/currencyConfig"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Plus, Minus, User } from "lucide-react"
 
 export function TeamArchitect() {
-  const { roles, updateRoleQuantity, masterRate } = useTeamStore()
+  const { roles, updateRoleQuantity, masterRate, selectedCurrency } = useTeamStore()
 
-  const formatK = (val: number) => `$${(val / 1000).toFixed(0)}k`
+  const formatK = (val: number) => {
+    if (!val || !isFinite(val)) return formatInHouseBenchmark(0, selectedCurrency);
+    return formatInHouseBenchmark(val, selectedCurrency);
+  }
 
   return (
     <Card className="flex flex-col border-border bg-card w-full overflow-hidden">
@@ -37,7 +41,7 @@ export function TeamArchitect() {
 
               <div className="flex justify-between items-center">
                 <div className="flex items-center bg-background border border-border/50 text-xs text-muted-foreground px-2.5 py-1.5 rounded font-mono">
-                  $ {masterRate} <span className="opacity-50 ml-1">/hr</span>
+                  {currencies[selectedCurrency].symbol}{currencies[selectedCurrency].symbolPosition === 'before_space' ? ' ' : ' '}{toDisplayCurrency(masterRate, selectedCurrency).toLocaleString('en-US', { maximumFractionDigits: 1 })} <span className="opacity-50 ml-1">/hr</span>
                 </div>
 
                 <div className="flex items-center bg-background border border-border/50 rounded-md p-0.5">

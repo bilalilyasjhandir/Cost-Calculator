@@ -1,6 +1,7 @@
 "use client"
 
 import { useTeamStore } from "@/store/teamStore"
+import { currencies, formatCurrency, formatCurrencyShort, toDisplayCurrency, toUSD, CurrencyCode } from "@/lib/currencyConfig"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -15,21 +16,22 @@ export function ROIDashboard() {
     funding, setFunding, 
     ventureMode, setVentureMode, 
     exitVal, setExitVal, 
-    estimate, updateEstimate 
+    estimate, updateEstimate,
+    selectedCurrency, setCurrency
   } = useTeamStore()
 
   useEffect(() => {
     updateEstimate()
   }, [updateEstimate])
 
-  const formatMoney = (val: number) => 
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val || 0)
-    
-  const formatK = (val: number) => {
-    if (!val || !isFinite(val)) return "$0.0k";
-    return "$" + (val / 1000).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "k"
+  const formatMoney = (val: number) => {
+    return formatCurrency(val, selectedCurrency)
   }
 
+  const formatK = (val: number) => {
+    if (!val || !isFinite(val)) return formatCurrency(0, selectedCurrency);
+    return formatCurrencyShort(val, selectedCurrency);
+  }
   if (!estimate) return null;
 
   return (
@@ -41,7 +43,7 @@ export function ROIDashboard() {
           <div className="flex flex-col flex-1 gap-4">
             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Team ROI Dashboard</h2>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Duration</label>
                 <Select value={duration.toString()} onValueChange={(val) => setDuration(Number(val))}>
@@ -57,15 +59,19 @@ export function ROIDashboard() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Master Rate (Min $25)</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Master Rate (Min {currencies[selectedCurrency].symbol}{currencies[selectedCurrency].symbolPosition === 'before_space' ? ' ' : ''}{Math.round(toDisplayCurrency(25, selectedCurrency))})</label>
                 <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{currencies[selectedCurrency].symbol}</span>
                   <Input 
-                    type="number" 
-                    min={25}
-                    value={masterRate}
-                    onChange={(e) => setMasterRate(Math.max(25, Number(e.target.value)))}
-                    className="pl-6 bg-background h-9"
+                    type="number"
+                    min={Math.round(toDisplayCurrency(25, selectedCurrency))}
+                    value={toDisplayCurrency(masterRate, selectedCurrency) || ''}
+                    onChange={(e) => {
+                      const displayRate = Number(e.target.value);
+                      const inUSD = toUSD(displayRate, selectedCurrency);
+                      setMasterRate(Math.max(25, inUSD));
+                    }}
+                    className={`bg-background h-9 ${selectedCurrency === 'PKR' ? 'pl-11' : 'pl-6'}`}
                   />
                 </div>
               </div>
@@ -73,12 +79,16 @@ export function ROIDashboard() {
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Funding</label>
                 <div className="relative">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                  <Input 
-                    type="number" 
-                    value={funding}
-                    onChange={(e) => setFunding(Number(e.target.value))}
-                    className="pl-6 bg-background h-9"
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">{currencies[selectedCurrency].symbol}</span>
+                  <Input
+                    type="number"
+                    value={toDisplayCurrency(funding, selectedCurrency) || ''}
+                    onChange={(e) => {
+                      const displayFunding = Number(e.target.value);
+                      const inUSD = toUSD(displayFunding, selectedCurrency);
+                      setFunding(inUSD);
+                    }}
+                    className={`bg-background h-9 ${selectedCurrency === 'PKR' ? 'pl-11' : 'pl-6'}`}
                   />
                 </div>
               </div>
@@ -97,11 +107,25 @@ export function ROIDashboard() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Currency</label>
+                <Select value={selectedCurrency} onValueChange={(val) => setCurrency(val as CurrencyCode)}>
+                  <SelectTrigger className="w-full bg-background h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">$ USD</SelectItem>
+                    <SelectItem value="SAR">⃁ SAR</SelectItem>
+                    <SelectItem value="PKR">PKR PKR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <AnimatePresence>
               {ventureMode === 'startup_equity' && (
-                <motion.div 
+                <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -109,13 +133,17 @@ export function ROIDashboard() {
                 >
                   <label className="text-[10px] font-bold text-accent uppercase tracking-wider">Exit Val</label>
                   <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-accent text-sm">$</span>
-                    <Input 
-                      type="number" 
-                      value={exitVal || ''}
-                      placeholder="70"
-                      onChange={(e) => setExitVal(Number(e.target.value))}
-                      className="pl-6 pr-8 bg-accent/5 border-accent/50 text-accent h-9"
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-accent text-sm">{currencies[selectedCurrency].symbol}</span>
+                    <Input
+                      type="number"
+                      value={exitVal ? toDisplayCurrency(exitVal, selectedCurrency) : ''}
+                      placeholder={toDisplayCurrency(70, selectedCurrency).toString()}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) setExitVal(null);
+                        else setExitVal(toUSD(Number(val), selectedCurrency));
+                      }}
+                      className={`pr-8 bg-accent/5 border-accent/50 text-accent h-9 ${selectedCurrency === 'PKR' ? 'pl-11' : 'pl-6'}`}
                     />
                     <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-accent text-sm font-bold">M</span>
                   </div>

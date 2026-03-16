@@ -1,13 +1,14 @@
 "use client"
 
 import { useProjectStore } from "@/store/projectStore"
+import { formatCurrency } from "@/lib/currencyConfig"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { Share, Download, GitCompare } from "lucide-react"
 import { CompareModal } from "../project-build/CompareModal"
 
 export function LiveEstimatePanel() {
-  const { estimate, aiEfficiency, selectedPlatform } = useProjectStore()
+  const { estimate, aiEfficiency, selectedPlatform, selectedCurrency } = useProjectStore()
   const [copied, setCopied] = useState(false)
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false)
 
@@ -18,8 +19,9 @@ export function LiveEstimatePanel() {
   }
 
   // Format dollars safely
-  const formatMoney = (val: number) => 
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val || 0)
+  const formatMoney = (val: number) => {
+    return formatCurrency(val, selectedCurrency)
+  }
 
   if (!estimate) {
     return (

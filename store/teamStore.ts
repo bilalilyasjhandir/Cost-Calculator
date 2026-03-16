@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { RoleSelection, TeamEstimate, calculateTeamEstimate } from '../lib/teamCalculations';
+import { CurrencyCode } from '../lib/currencyConfig';
 
 export const defaultRoles: RoleSelection[] = [
   { id: 'r1', name: 'Senior Developer', inHouseSalary: 145000, quantity: 0 },
@@ -19,6 +20,7 @@ interface TeamStore {
   ventureMode: 'bootstrap' | 'startup_equity';
   exitVal: number | null;
   estimate: TeamEstimate | null;
+  selectedCurrency: CurrencyCode;
 
   updateRoleQuantity: (roleId: string, quantity: number) => void;
   setDuration: (months: number) => void;
@@ -26,6 +28,7 @@ interface TeamStore {
   setFunding: (amount: number) => void;
   setVentureMode: (mode: 'bootstrap' | 'startup_equity') => void;
   setExitVal: (val: number | null) => void;
+  setCurrency: (currency: CurrencyCode) => void;
   updateEstimate: () => void;
 }
 
@@ -37,6 +40,7 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
   ventureMode: 'bootstrap',
   exitVal: null,
   estimate: null,
+  selectedCurrency: 'USD',
 
   updateRoleQuantity: (roleId, quantity) => {
     set((state) => ({
@@ -63,6 +67,9 @@ export const useTeamStore = create<TeamStore>((set, get) => ({
   setExitVal: (val) => {
     set({ exitVal: val });
     get().updateEstimate();
+  },
+  setCurrency: (currency) => {
+    set({ selectedCurrency: currency });
   },
   updateEstimate: () => {
     const { roles, duration, masterRate, funding, ventureMode, exitVal } = get();

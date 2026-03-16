@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Download, Info, Lightbulb } from "lucide-react";
 import { useProjectStore } from "@/store/projectStore";
+import { formatCurrency } from "@/lib/currencyConfig";
 import { calculateMVPEstimate, getComparisonSummary } from "@/lib/comparisonCalculations";
 import { Feature, Platform } from "@/lib/featureData";
 
@@ -11,7 +12,7 @@ interface CompareModalProps {
 
 export function CompareModal({ isOpen, onClose }: CompareModalProps) {
   const store = useProjectStore();
-  
+
   if (!isOpen || !store.estimate) return null;
 
   // Re-build "inputs" from the current store to pass to recalculator
@@ -28,8 +29,9 @@ export function CompareModal({ isOpen, onClose }: CompareModalProps) {
   const fullEstimate = store.estimate;
   const summary = getComparisonSummary(mvpEstimate, fullEstimate, store.selectedFeatures);
 
-  const formatMoney = (val: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val || 0);
+  const formatMoney = (val: number) => {
+    return formatCurrency(val, store.selectedCurrency);
+  }
 
   const allFeatures = store.selectedFeatures;
   const mvpFeatures = summary.mvpFeatures;

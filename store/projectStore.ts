@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Platform, Feature, AddOn } from '../lib/featureData';
 import { calculateProjectEstimate, ProjectEstimate } from '../lib/projectCalculations';
+import { CurrencyCode } from '../lib/currencyConfig';
 
 interface ProjectStore {
   hourlyRate: number;
@@ -10,6 +11,7 @@ interface ProjectStore {
   selectedFeatures: Feature[];
   selectedAddOns: AddOn[];
   estimate: ProjectEstimate | null;
+  selectedCurrency: CurrencyCode;
 
   setHourlyRate: (rate: number) => void;
   setIndustry: (industry: string) => void;
@@ -17,6 +19,7 @@ interface ProjectStore {
   selectPlatform: (platform: Platform) => void;
   toggleFeature: (feature: Feature) => void;
   toggleAddOn: (addOn: AddOn) => void;
+  setCurrency: (currency: CurrencyCode) => void;
   updateEstimate: () => void;
 }
 
@@ -28,6 +31,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
   selectedFeatures: [],
   selectedAddOns: [],
   estimate: null,
+  selectedCurrency: 'USD',
 
   setHourlyRate: (rate) => {
     set({ hourlyRate: rate });
@@ -65,6 +69,9 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       };
     });
     get().updateEstimate();
+  },
+  setCurrency: (currency) => {
+    set({ selectedCurrency: currency });
   },
   updateEstimate: () => {
     const { hourlyRate, aiEfficiency, selectedPlatform, selectedFeatures, selectedAddOns } = get();

@@ -1,31 +1,41 @@
 "use client"
 
 import { useProjectStore } from "@/store/projectStore"
+import { currencies, toDisplayCurrency, toUSD, CurrencyCode } from "@/lib/currencyConfig"
 import { Slider } from "@/components/ui/slider"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 
 export function ProjectBasics() {
-  const { hourlyRate, setHourlyRate, aiEfficiency, setAiEfficiency, industry, setIndustry } = useProjectStore()
+  const { 
+    hourlyRate, setHourlyRate, 
+    aiEfficiency, setAiEfficiency, 
+    industry, setIndustry,
+    selectedCurrency, setCurrency 
+  } = useProjectStore()
 
   return (
     <Card className="p-6 mb-8 border-border bg-card">
       <h3 className="text-xl font-bold mb-6">Project Parameters</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-        
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+
         <div className="space-y-3">
-          <label className="text-sm font-medium text-muted-foreground block">
-            Hourly Rate (Min $25)
+          <label className="text-sm font-medium text-muted-foreground block whitespace-nowrap">
+            Hourly Rate (Min {currencies[selectedCurrency].symbol}{currencies[selectedCurrency].symbolPosition === 'before_space' ? ' ' : ''}{Math.round(toDisplayCurrency(25, selectedCurrency))})
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-            <Input 
-              type="number" 
-              min={25}
-              value={hourlyRate}
-              onChange={(e) => setHourlyRate(Math.max(25, Number(e.target.value)))}
-              className="pl-8 !bg-transparent"
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{currencies[selectedCurrency].symbol}</span>
+            <Input
+              type="number"
+              min={Math.round(toDisplayCurrency(25, selectedCurrency))}
+              value={toDisplayCurrency(hourlyRate, selectedCurrency) || ''}
+              onChange={(e) => {
+                const displayRate = Number(e.target.value);
+                const inUSD = toUSD(displayRate, selectedCurrency);
+                setHourlyRate(Math.max(25, inUSD));
+              }}
+              className={`!bg-transparent ${selectedCurrency === 'PKR' ? 'pl-11' : 'pl-8'}`}
             />
           </div>
         </div>
@@ -45,6 +55,22 @@ export function ProjectBasics() {
               <SelectItem value="Edtech & Learning">Edtech & Learning</SelectItem>
               <SelectItem value="Field Services">Field Services</SelectItem>
               <SelectItem value="Remote Work Platforms">Remote Work Platforms</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-muted-foreground block">
+            Currency
+          </label>
+          <Select value={selectedCurrency} onValueChange={(val) => setCurrency(val as CurrencyCode)}>
+            <SelectTrigger className="w-full !bg-transparent">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="USD">$ USD</SelectItem>
+              <SelectItem value="SAR">⃁ SAR</SelectItem>
+              <SelectItem value="PKR">PKR PKR</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -2,12 +2,13 @@
 
 import { useProjectStore } from "@/store/projectStore"
 import { platforms } from "@/lib/featureData"
+import { formatCurrencyShort } from "@/lib/currencyConfig"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Smartphone, Monitor, MonitorSmartphone } from "lucide-react"
 
 export function PlatformSelector() {
-  const { selectedPlatform, selectPlatform } = useProjectStore()
+  const { selectedPlatform, selectPlatform, selectedCurrency } = useProjectStore()
 
   return (
     <div className="mb-8">
@@ -37,7 +38,7 @@ export function PlatformSelector() {
                 <div>
                   <h4 className="font-bold text-lg">{platform.name}</h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Starts at ${(platform.cost / 1000).toFixed(0)}k
+                    Starts at {formatCurrencyShort(platform.cost, selectedCurrency)}
                   </p>
                 </div>
               </div>

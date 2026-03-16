@@ -3,13 +3,14 @@
 import { useProjectStore } from "@/store/projectStore"
 import { projectFeatures, projectAddOns } from "@/lib/featureData"
 import { getMVPFeatures } from "@/lib/comparisonCalculations"
+import { formatCurrency } from "@/lib/currencyConfig"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function FeaturesSection() {
-  const { selectedPlatform, selectedFeatures, toggleFeature, selectedAddOns, toggleAddOn } = useProjectStore()
+  const { selectedPlatform, selectedFeatures, toggleFeature, selectedAddOns, toggleAddOn, selectedCurrency } = useProjectStore()
 
   if (!selectedPlatform) return null
 
@@ -56,7 +57,7 @@ export function FeaturesSection() {
                           </span>
                           {feature.runCost && (
                             <Badge variant="secondary" className="text-[10px] whitespace-nowrap bg-muted">
-                              ${feature.runCost}/mo
+                              {formatCurrency(feature.runCost, selectedCurrency)}/mo
                             </Badge>
                           )}
                         </div>
@@ -87,7 +88,7 @@ export function FeaturesSection() {
                 >
                   <span className="font-bold">{addon.name}</span>
                   <span className="text-xs text-muted-foreground mt-1">
-                    +${addon.buildCost.toLocaleString()} | ${addon.opEx}/mo
+                    +{formatCurrency(addon.buildCost, selectedCurrency)} | {formatCurrency(addon.opEx, selectedCurrency)}/mo
                   </span>
                 </button>
               )
