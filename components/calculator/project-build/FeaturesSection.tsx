@@ -2,6 +2,7 @@
 
 import { useProjectStore } from "@/store/projectStore"
 import { projectFeatures, projectAddOns } from "@/lib/featureData"
+import { getMVPFeatures } from "@/lib/comparisonCalculations"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
@@ -11,6 +12,8 @@ export function FeaturesSection() {
   const { selectedPlatform, selectedFeatures, toggleFeature, selectedAddOns, toggleAddOn } = useProjectStore()
 
   if (!selectedPlatform) return null
+
+  const mvpFeatureIds = new Set(getMVPFeatures(selectedFeatures).map(f => f.id))
 
   // Group features by category
   const categories = Array.from(new Set(projectFeatures.map(f => f.category)))
@@ -37,11 +40,16 @@ export function FeaturesSection() {
                       <Card
                         key={feature.id}
                         className={cn(
-                          "p-4 cursor-pointer transition-all hover:bg-accent/5",
+                          "relative p-4 cursor-pointer transition-all hover:bg-accent/5 pt-6",
                           isSelected ? "border-accent bg-accent/5" : "border-border bg-card"
                         )}
                         onClick={() => toggleFeature(feature)}
                       >
+                        {isSelected && mvpFeatureIds.has(feature.id) && (
+                          <div className="absolute top-0 left-0 bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-br-md border-r border-b border-primary/20">
+                            MVP
+                          </div>
+                        )}
                         <div className="flex justify-between items-start gap-2">
                           <span className={cn("font-medium text-sm leading-tight", isSelected ? "text-foreground" : "text-muted-foreground")}>
                             {feature.name}

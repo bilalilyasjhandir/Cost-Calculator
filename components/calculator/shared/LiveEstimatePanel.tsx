@@ -3,11 +3,13 @@
 import { useProjectStore } from "@/store/projectStore"
 import { motion } from "framer-motion"
 import { useState } from "react"
-import { Share, Download } from "lucide-react"
+import { Share, Download, GitCompare } from "lucide-react"
+import { CompareModal } from "../project-build/CompareModal"
 
 export function LiveEstimatePanel() {
-  const { estimate, aiEfficiency } = useProjectStore()
+  const { estimate, aiEfficiency, selectedPlatform } = useProjectStore()
   const [copied, setCopied] = useState(false)
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false)
 
   const handleShare = () => {
     // Dummy handler for now, spec says Next Step
@@ -21,8 +23,35 @@ export function LiveEstimatePanel() {
 
   if (!estimate) {
     return (
-      <div className="bg-card border border-border rounded-xl p-8 sticky top-6 opacity-50 text-center">
-        <p className="text-muted-foreground">Select a platform and features to see your live estimate.</p>
+      <div className="bg-card border border-border rounded-xl p-6 lg:p-8 sticky top-6 text-center opacity-50 flex flex-col justify-center items-center">
+        <h2 className="text-xs font-bold tracking-widest text-muted-foreground uppercase mb-6 self-start">
+          Live Estimate
+        </h2>
+        <p className="text-muted-foreground flex-1 flex items-center justify-center min-h-[200px]">Select a platform and features to see your live estimate.</p>
+        
+        <div className="w-full flex flex-col gap-3 mt-8">
+          <div className="group relative w-full">
+            <button 
+              disabled
+              className="w-full flex items-center justify-center gap-2 border border-border py-3 rounded-lg font-bold text-sm bg-muted text-muted-foreground cursor-not-allowed"
+            >
+              <GitCompare className="w-4 h-4" />
+              COMPARE MVP vs FULL BUILD
+            </button>
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+              Select a platform first
+            </span>
+          </div>
+
+          <button disabled className="w-full flex items-center justify-center gap-2 bg-[#c18b43]/50 text-white py-3 rounded-lg font-bold cursor-not-allowed">
+            <Download className="w-4 h-4" />
+            EXPORT REPORT
+          </button>
+          <button disabled className="w-full flex items-center justify-center gap-2 border border-border bg-muted py-3 rounded-lg font-bold cursor-not-allowed">
+            <Share className="w-4 h-4" />
+            SHARE CALCULATION
+          </button>
+        </div>
       </div>
     )
   }
@@ -111,6 +140,22 @@ export function LiveEstimatePanel() {
       )}
 
       <div className="flex flex-col gap-3">
+        <div className="group relative w-full mb-2">
+          <button 
+            onClick={() => setIsCompareModalOpen(true)}
+            disabled={!selectedPlatform}
+            className="w-full flex items-center justify-center gap-2 border border-border hover:bg-accent/5 py-3 rounded-lg font-bold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <GitCompare className="w-4 h-4" />
+            COMPARE MVP vs FULL BUILD
+          </button>
+          {!selectedPlatform && (
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+              Select a platform first
+            </span>
+          )}
+        </div>
+
         <button className="w-full flex items-center justify-center gap-2 bg-[#c18b43] text-white hover:bg-[#86602c] py-3 rounded-lg font-bold transition-colors">
           <Download className="w-4 h-4" />
           EXPORT REPORT
@@ -123,7 +168,9 @@ export function LiveEstimatePanel() {
           {copied ? "LINK COPIED! 📋" : "SHARE CALCULATION"}
         </button>
       </div>
-
-    </div>
+      <CompareModal 
+        isOpen={isCompareModalOpen} 
+        onClose={() => setIsCompareModalOpen(false)} 
+      />    </div>
   )
 }
