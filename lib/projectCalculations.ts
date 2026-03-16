@@ -16,6 +16,8 @@ export interface ProjectEstimate {
   youSave: number;
   featuresSelected: number;
   aiWorkloadPercent: number;
+  estimatedWeeks: number;
+  estimatedMonths: number;
 }
 
 export function calculateProjectEstimate(inputs: ProjectInputs): ProjectEstimate {
@@ -46,6 +48,21 @@ export function calculateProjectEstimate(inputs: ProjectInputs): ProjectEstimate
 
   const totalEstimatedCost = rawTotal - aiDiscount;
 
+  const hasPlatform = platform && platform.id !== 'none';
+  
+  // Time calculations
+  const platformBaseWeeks = hasPlatform ? platform.timeWeeks : 0;
+  const featureWeeks = selectedFeatures.reduce((sum, f) => sum + f.timeWeeks, 0);
+  const addOnWeeks = selectedAddOns.reduce((sum, a) => sum + (a.timeWeeks || 0), 0);
+  
+  const rawWeeks = platformBaseWeeks + featureWeeks + addOnWeeks;
+  const aiTimeDiscount = rawWeeks * (aiEfficiency / 100);
+  const adjustedWeeks = rawWeeks - aiTimeDiscount;
+  
+  // Always be conservative: Math.ceil for weeks, round months to 1 decimal point. If a platform is selected, minimum time ensures we display realistic delivery rather than zero. 
+  const displayWeeks = hasPlatform ? Math.max(1, Math.ceil(adjustedWeeks)) : 0;
+  const displayMonths = hasPlatform ? Math.max(0.2, parseFloat((adjustedWeeks / 4.33).toFixed(1))) : 0;
+
   // Monthly run cost
   const monthlyRunCost = selectedFeatures
     .filter(f => f.runCost)
@@ -62,5 +79,7 @@ export function calculateProjectEstimate(inputs: ProjectInputs): ProjectEstimate
     youSave,
     featuresSelected: selectedFeatures.length,
     aiWorkloadPercent: aiEfficiency * 1.05,
+    estimatedWeeks: displayWeeks,
+    estimatedMonths: displayMonths,
   };
 }

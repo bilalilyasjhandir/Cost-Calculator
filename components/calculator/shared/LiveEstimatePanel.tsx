@@ -57,6 +57,14 @@ export function LiveEstimatePanel() {
 
       <div className="space-y-4 text-sm mb-8 border-t border-b border-border/50 py-6">
         <div className="flex justify-between items-center">
+          <span className="text-muted-foreground">Estimated Time</span>
+          <span className="font-bold">
+            {estimate.estimatedWeeks > 0 
+              ? `~${estimate.estimatedWeeks} Weeks / ~${estimate.estimatedMonths.toFixed(1)} Months` 
+              : "—"}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
           <span className="text-muted-foreground">Platform Base</span>
           <span className="font-medium">{formatMoney(estimate.platformBase)}</span>
         </div>

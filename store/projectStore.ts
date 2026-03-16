@@ -75,7 +75,7 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
     const estimate = calculateProjectEstimate({
       hourlyRate,
       aiEfficiency,
-      platform: selectedPlatform || { id: 'none', name: 'None', cost: 0 },
+      platform: selectedPlatform || { id: 'none', name: 'None', cost: 0, timeWeeks: 0 },
       selectedFeatures,
       selectedAddOns
     });
