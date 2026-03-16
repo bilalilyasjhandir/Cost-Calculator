@@ -80,31 +80,32 @@ export function LiveEstimatePanel() {
 
       {aiEfficiency > 0 && (
         <div className="mb-8 bg-accent/5 p-4 rounded-lg border border-accent/20">
-          <h4 className="text-xs text-foreground font-bold uppercase mb-3 text-center">AI Workload Optimization</h4>
-          <div className="space-y-3 text-xs font-medium">
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-muted-foreground">Traditional Execution</span>
-                <span className="text-foreground">100% Human</span>
-              </div>
-              <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-muted-foreground/30 w-full" />
-              </div>
+          <h4 className="text-xs text-foreground font-bold uppercase mb-4 text-center">AI Workload Optimization</h4>
+          
+          <div className="flex justify-between items-end mb-2 text-xs">
+            <div className="text-muted-foreground flex flex-col">
+              <span>Traditional Execution</span>
+              <span className="font-bold">{100 - aiEfficiency}% Human</span>
             </div>
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-[#c18b43] font-bold">Barakode Augmented</span>
-                <span className="text-[#c18b43] font-bold">{aiEfficiency}% AI Support</span>
-              </div>
-              <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                <motion.div
-                   className="h-full bg-[#c18b43]"
-                   initial={{ width: 0 }}
-                   animate={{ width: `${aiEfficiency}%` }}
-                   transition={{ duration: 0.5 }}
-                />
-              </div>
+            <div className="text-[#c18b43] flex flex-col text-right">
+              <span className="font-bold">Barakode Augmented</span>
+              <span className="font-bold">{aiEfficiency}% AI Support</span>
             </div>
+          </div>
+          
+          <div className="h-2 w-full flex rounded-full overflow-hidden">
+            <motion.div
+               className="h-full bg-muted-foreground/30"
+               initial={{ width: '100%' }}
+               animate={{ width: `${100 - aiEfficiency}%` }}
+               transition={{ duration: 0.5 }}
+            />
+            <motion.div
+               className="h-full bg-[#c18b43]"
+               initial={{ width: 0 }}
+               animate={{ width: `${aiEfficiency}%` }}
+               transition={{ duration: 0.5 }}
+            />
           </div>
         </div>
       )}
