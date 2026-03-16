@@ -21,7 +21,7 @@ export function FeaturesSection() {
         initial={{ opacity: 0, height: 0 }}
         animate={{ opacity: 1, height: "auto" }}
         exit={{ opacity: 0, height: 0 }}
-        className="space-y-10 overflow-hidden"
+        className="space-y-10 overflow-hidden px-1 -mx-1"
       >
         <div className="space-y-8">
           <h3 className="text-2xl font-bold border-b border-border pb-2">Features</h3>
