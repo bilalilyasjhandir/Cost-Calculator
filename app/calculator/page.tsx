@@ -7,6 +7,7 @@ import { FeaturesSection } from "@/components/calculator/project-build/FeaturesS
 import { LiveEstimatePanel } from "@/components/calculator/shared/LiveEstimatePanel"
 import { TeamArchitect } from "@/components/calculator/team-scaling/TeamArchitect"
 import { ROIDashboard } from "@/components/calculator/team-scaling/ROIDashboard"
+import { AIAnalyzer } from "@/components/calculator/project-build/AIAnalyzer"
 
 export default function CalculatorPage() {
   const [activeTab, setActiveTab] = useState<'build' | 'scale'>('build')
@@ -72,6 +73,7 @@ export default function CalculatorPage() {
             
             {/* Main Content Area */}
             <div className="lg:col-span-8 space-y-8">
+              <AIAnalyzer />
               <ProjectBasics />
               <PlatformSelector />
               <FeaturesSection />

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Platform, Feature, AddOn } from '../lib/featureData';
+import { Platform, Feature, AddOn, projectFeatures, projectAddOns } from '../lib/featureData';
 import { calculateProjectEstimate, ProjectEstimate } from '../lib/projectCalculations';
 import { CurrencyCode } from '../lib/currencyConfig';
 
@@ -19,9 +19,15 @@ interface ProjectStore {
   selectPlatform: (platform: Platform) => void;
   toggleFeature: (feature: Feature) => void;
   toggleAddOn: (addOn: AddOn) => void;
+  toggleFeatureById: (id: string) => void;
+  toggleAddOnById: (id: string) => void;
+  clearAllFeaturesAndAddOns: () => void;
   setCurrency: (currency: CurrencyCode) => void;
   updateEstimate: () => void;
 }
+
+const featureMap = new Map(projectFeatures.map(f => [f.id, f]));
+const addOnMap = new Map(projectAddOns.map(a => [a.id, a]));
 
 export const useProjectStore = create<ProjectStore>((set, get) => ({
   hourlyRate: 100,
@@ -68,6 +74,36 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
           : [...state.selectedAddOns, addOn]
       };
     });
+    get().updateEstimate();
+  },
+  toggleFeatureById: (id) => {
+    set((state) => {
+      const feature = featureMap.get(id);
+      if (!feature) return state;
+      const exists = state.selectedFeatures.some(f => f.id === id);
+      return {
+        selectedFeatures: exists
+          ? state.selectedFeatures.filter(f => f.id !== id)
+          : [...state.selectedFeatures, feature]
+      };
+    });
+    get().updateEstimate();
+  },
+  toggleAddOnById: (id) => {
+    set((state) => {
+      const addOn = addOnMap.get(id);
+      if (!addOn) return state;
+      const exists = state.selectedAddOns.some(a => a.id === id);
+      return {
+        selectedAddOns: exists
+          ? state.selectedAddOns.filter(a => a.id !== id)
+          : [...state.selectedAddOns, addOn]
+      };
+    });
+    get().updateEstimate();
+  },
+  clearAllFeaturesAndAddOns: () => {
+    set({ selectedFeatures: [], selectedAddOns: [] });
     get().updateEstimate();
   },
   setCurrency: (currency) => {
