@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = { 
-  title: "Cost Calculator" 
+  title: "Barakode | Cost Calculator" 
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

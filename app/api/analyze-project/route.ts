@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL ?? '',
-        'X-Title': 'Project Cost Calculator',
+        'X-Title': 'Barakode | Cost Calculator',
       },
       body: JSON.stringify({
         model: process.env.OPENROUTER_MODEL,
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
           }
         ],
         temperature: 0.1,       // low temperature = more deterministic, less creative
-        max_tokens: 1000,
+        max_tokens: 4096,
       })
     })
 
