@@ -43,8 +43,8 @@ content = content.replace(
 
 let lines = content.split("\\n");
 for (let i = 0; i < lines.length; i++) {
-   if (lines[i].includes("")) {
-       lines[i] = lines[i].replace(//g, "&bull;");
+   if (lines[i].includes("\uFFFD")) {
+       lines[i] = lines[i].replace(/\uFFFD/g, "&bull;");
    }
 }
 content = lines.join("\\n");
